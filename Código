@@ -1,0 +1,73 @@
+use std::fs;
+use std::fs::File;
+use std::io::Write;
+
+fn main(){
+    //Transforma el archivo de texto a string.
+    let archivo_string = fs::read_to_string("notas.txt").expect("No se pudo leer el archivo.");
+    //se crea la matriz donde serán guardados los datos limpios.
+    let mut matriz_archivo:[[&str;7];4] = [["";7];4];
+    let mut filas = 0;
+    //Va quitando los saltos de línea pasando por cada fila del archivo.
+    for x in archivo_string.split("\n"){
+        let mut columnas = 0;
+        //Va eliminando los ':' que está entre cada elemento, pasando por cada elemento del archivo.
+        for y in x.split(":"){
+            
+            if columnas < 7{
+                //Se agregan los datos a la matriz.
+                matriz_archivo[filas][columnas] = y.trim()
+            }
+            columnas += 1;
+        }
+
+        filas += 1;
+       
+    }
+    
+    let mut guardar = String::from("");
+    let mut resultado = String::from("");
+    //El print es sólo para que no aparezca un warning.
+    println!("{}", resultado);
+    
+    
+    for i in 0..4{
+        let mut promedio:f32 = 0.0;
+        
+        //Se van sacando los promedios de cada alumno.
+        for j in 1..7{
+            let a = matriz_archivo[i][j];
+            promedio += a.parse::<f32>().unwrap();
+
+        }
+
+        promedio = promedio/6 as f32;
+        
+        //Se verifica si aprobó o no.
+        if promedio>= 4.0{
+            let nombre = String::from(matriz_archivo[i][0]);
+            let espacio = String::from(" ");
+            let aprobado = String::from("aprobó.\n");
+            resultado = nombre + &espacio + &aprobado;
+            
+        }else{
+            let nombre = String::from (matriz_archivo[i][0]);
+            let espacio = String::from(" ");
+            let reprobado = String::from("reprobó.\n");
+            resultado = nombre + &espacio + &reprobado;
+ 
+        }
+        //La variable contiene toda la información que será agregada al archivo de Texto con los resultados.
+        guardar += &resultado;
+        
+    }
+    //En las lineas siguientes se crea el nuevo archivo si es que no está creado con anterioridad,
+    //además en ese archivo nuevo se agrega el nombre y si aprobó o no cada alumno.
+    let texto = &guardar.trim();
+    let mut archivo = File::create("Reporte.txt").unwrap();
+    archivo.write_all(texto.as_bytes()).unwrap();
+    println!("{}", texto)
+    //El texto creado no se agrega sobre lo que ya está, sino que borra lo que tiene el archivo y escribe
+    //los nuevos datos.
+    
+}
